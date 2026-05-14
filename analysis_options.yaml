@@ -1,0 +1,16 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.gr.dart"
+    - "build/**"
+    - "third_party/**"
+
+linter:
+  rules:
+    # Project-specific overrides go here. Keep this list small — the
+    # very_good_analysis defaults are the project's style.
+    public_member_api_docs: false
+    lines_longer_than_80_chars: false
