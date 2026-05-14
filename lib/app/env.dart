@@ -12,8 +12,9 @@ class Env {
   static bool get authEnabled =>
       (dotenv.env['AUTH_ENABLED'] ?? 'true').toLowerCase() == 'true';
 
+  /// Real Supabase anon keys are JWTs (~200+ chars); anything shorter is
+  /// almost certainly a `.env.example` placeholder, so we treat the app as
+  /// unconfigured and skip Supabase init.
   static bool get hasSupabaseCredentials =>
-      supabaseUrl.isNotEmpty &&
-      supabaseAnonKey.isNotEmpty &&
-      !supabaseUrl.contains('example.supabase.co');
+      supabaseUrl.startsWith('https://') && supabaseAnonKey.length > 100;
 }
