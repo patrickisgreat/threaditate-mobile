@@ -259,6 +259,54 @@ After modifying the Rust crate's public API, regenerate the Dart bindings with `
 
 ---
 
+## Implementing a feature — read these first
+
+This repo is the mobile port of a web app that already exists. **Every user-facing feature has a canonical implementation in the web repo.** Before building a feature here, read the spec for it and cross-check against the web source so you don't miss subtle behaviors.
+
+### Process
+
+1. **Start at [docs/features.md](docs/features.md).** It's the catalog of every user-facing feature in the web app, grouped by area, with mobile-port priorities (MUST / SHOULD / COULD / SKIP) and a status tracker showing what's already been ported.
+
+2. **Read the per-feature spec** at `docs/features/<feature-name>.md` if one exists. These cover the complex flows (player, image editor, planning, painter, etc.) with user flows, edge cases, error states, and references to the web implementation.
+
+3. **Fetch the web implementation** when the spec is ambiguous or when you need to confirm a detail. The web repo is public at `patrickisgreat/threaditate`. Use the `gh` CLI:
+
+   ```bash
+   # Read a specific file
+   gh api repos/patrickisgreat/threaditate/contents/src/components/Player/Controller/Controller.tsx \
+     --jq '.content' | base64 -d
+
+   # Search the web repo for a symbol or string
+   gh search code --repo patrickisgreat/threaditate "useResponsiveDiameter"
+
+   # Read the web repo's CLAUDE.md (root-level project standards)
+   gh api repos/patrickisgreat/threaditate/contents/CLAUDE.md \
+     --jq '.content' | base64 -d
+   ```
+
+   These work without cloning the repo. Use them freely — round-tripping to GitHub is cheaper than guessing at a feature's behavior.
+
+4. **Don't assume the spec is authoritative when it conflicts with the web source.** The web code is the source of truth for behavior; docs/features can drift. If you spot a discrepancy, update the spec in the same PR that implements the feature.
+
+### What goes in docs/features/ specs
+
+Each spec captures, for one feature:
+
+- **User flow** — what the user does, step by step
+- **Inputs** — fields, controls, gestures
+- **Outputs** — what changes on screen, what's persisted
+- **Edge cases** — empty state, error state, network failure, oversized image, etc.
+- **Mobile deviations** — where the mobile UX intentionally differs from web (e.g. native image picker instead of drag-and-drop)
+- **Web references** — file paths in threaditate that implement this feature
+
+When you ship a new mobile feature, **update docs/features.md's status tracker** in the same PR so the next session knows it's done.
+
+### What's intentionally NOT in the mobile port
+
+The catalog marks several features `SKIP` — they're admin-only or web-development conveniences and don't belong on the mobile app. Don't port them without asking. Examples include the admin algorithm-tuning panel and the test-mode snapshot capture.
+
+---
+
 ## Things to know before making changes
 
 - The Supabase schema is shared with the web app. **Schema migrations live in the web repo.** Coordinate.
